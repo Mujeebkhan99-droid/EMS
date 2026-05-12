@@ -1,0 +1,40 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "mongodb" // ya postgresql jo bhi aap use kar rahe hain
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Admin {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  email    String @unique
+  password String
+}
+
+model Employee {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String     @unique
+  departmentId String     @db.ObjectId
+  department   Department @relation(fields: [departmentId], references: [id])
+  salary       Float
+  role         String
+  createdAt    DateTime   @default(now())
+}
+
+model Department {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  name      String     @unique
+  employees Employee[]
+}
+model Attendance {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  date       DateTime @default(now())
+  status     String   // Present, Absent, Late
+  employeeId String   @db.ObjectId
+  employee   Employee @relation(fields: [employeeId], references: [id])
+}
